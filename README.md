@@ -1,21 +1,39 @@
-# MLOps Time-Series Platform: Multi-Store Forecasting with Rolling Retrain
+# 🛒 MLOps Multi-Store Forecasting
 
-**Advanced Title:** MLOps Time-Series Platform: Multi-Store Forecasting with Rolling Retrain
+An **end-to-end MLOps project** for **retail sales forecasting across multiple stores & SKUs**.  
+This repository demonstrates how to design, build, and deploy a **production-grade ML pipeline** including:
 
-## Summary
-This project demonstrates a practical, reproducible pipeline for multi-store, multi-SKU time-series forecasting. 
-It includes:
-- Synthetic multi-tenant time-series data generation.
-- Rolling window backtesting and evaluation (MAPE, RMSE).
-- Simple model registry (filesystem-based versioning).
-- Drift detection on covariates and automated retrain trigger logic.
-- Dockerized training and serving components (FastAPI for inference).
-- CI tests and basic monitoring job that writes metrics to a simple CSV/JSON dashboard.
-- Clear README and runnable scripts to reproduce experiments locally.
+- 📊 **Feature Engineering** with rolling aggregates & lag-based predictors  
+- 🔁 **Rolling Backtesting** for robust model evaluation  
+- 🌲 **Random Forest Regressor (baseline)** – extendable to advanced models (XGBoost, LSTM, Transformer)  
+- ⚡ **FastAPI Model Serving** with REST endpoints  
+- 📈 **Streamlit Dashboard** for interactive forecasting exploration  
+- 🐳 **Dockerized Workflows** for training & serving pipelines  
+- 🔧 **MLOps Best Practices**: experiment tracking, artifact management, reproducible builds  
 
-> Notes: This is intentionally *not* perfect — it aims to appear human-authored with practical engineering decisions and some deliberate simplifications.
+---
 
-## Quick start (local)
+**🚀 Project Structure**
+```bash
+mlops-multi-store-forecasting/
+│
+├── data/                # Input datasets (per store & SKU)
+├── artifacts/           # Trained models, metrics, logs
+│
+├── src/
+│   ├── features.py      # Feature engineering pipeline
+│   ├── train_backtest.py # Rolling backtesting & training
+│   ├── serve.py         # FastAPI inference service
+│   ├── dashboard.py     # Streamlit dashboard for exploration
+│   └── utils.py         # Helper functions
+│
+├── Dockerfile.train     # Docker image for training jobs
+├── Dockerfile.serve     # Docker image for serving API
+├── requirements.txt     # Python dependencies
+└── README.md            # Project documentation
+```
+---
+**⚡ Quickstart**
 1. Create a virtual env and install requirements:
    ```bash
    python -m venv venv
@@ -28,41 +46,60 @@ It includes:
    ```
 3. Run rolling training/backtest:
    ```bash
-   python src/train_backtest.py --data_dir data/ --out artifacts/
+   python -m src.train_backtest --data_dir data/ --out artifacts/
    ```
 4. Serve a saved model (registry/v1):
    ```bash
    cd src && uvicorn serve:app --host 0.0.0.0 --port 8000
    ```
+   Endpoint: POST http://127.0.0.1:8000/predict
+
+   Example request:
+   {
+     "store_id": 1,
+     "sku": 42,
+     "date": "2025-09-01",
+     "features": {...}
+   }
 5. Run monitoring job (writes `artifacts/monitoring.json`):
    ```bash
    python src/monitoring.py --data_dir data/ --models_dir registry/ --out artifacts/monitoring.json
    ```
 
-## What to explore next
-- Replace the simple RandomForest model with LightGBM or neural forecasting model.
-- Add proper feature stores / cloud-based model registry (S3 + MLflow).
-- Replace naive drift tests with more robust statistical tests and alerting.
+6. Explore with Streamlit Dashboard
+   ```bash
+   streamlit run src/dashboard.py
+   ```
+**🐳 Dockerized Workflows**
+1. Training
+   ```bash
+   docker build -f Dockerfile.train -t mlops-forecast-train:latest .
+   docker run --rm -v ${PWD}/data:/app/data -v ${PWD}/artifacts:/app/artifacts mlops-forecast-train:latest
+   ```
+2. Serving
+   ```bash
+   docker build -f Dockerfile.serve -t mlops-forecast-serve:latest .
+   docker run -p 8000:8000 mlops-forecast-serve:latest
+   ```
+---
+**🛠️ Tech Stack**  
+- Python (pandas, scikit-learn, numpy)  
+- FastAPI for model serving  
+- Streamlit for dashboarding  
+- Docker for containerized workflows  
+- MLflow / JSON Artifacts for tracking experiments (extensible)  
+---
+**🔮 Future Scope**  
+✅ Integrate XGBoost / LightGBM / Deep Learning models  
+✅ Add MLflow experiment tracking  
+✅ CI/CD with GitHub Actions  
+✅ Kubernetes deployment for scalable inference  
 
-## Structure
-````
-mlops_multi_store_forecasting/
-├── data/                      # generated sample data (CSV)
-├── registry/                  # saved models and metadata
-├── src/
-│   ├── data_generation.py
-│   ├── features.py
-│   ├── train_backtest.py
-│   ├── model.py
-│   ├── serve.py
-│   ├── monitoring.py
-│   └── utils.py
-├── artifacts/                 # outputs: metrics, plots, dashboard
-├── Dockerfile.train
-├── Dockerfile.serve
-├── requirements.txt
-├── .github/workflows/ci.yml
-└── README.md
-````
+---
+**🤝 Contributing**  
+PRs are welcome! For major changes, please open an issue first to discuss what you’d like to change.  
 
-MIT License — feel free to adapt for your portfolio.
+---
+**👨‍💻 Author**  
+Kshitij Maurya  
+Data Scientist | AI/ML Engineer | Product Thinker  
