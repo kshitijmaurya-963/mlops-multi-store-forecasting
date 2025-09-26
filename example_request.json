@@ -1,0 +1,5 @@
+{
+  "store_id": "store_000",
+  "sku": "sku_001",
+  "features": {"lag_7": 23.0, "lag_14": 20.0, "roll_mean_7": 22.0, "roll_mean_28": 21.0, "sku_mean": 24.0, "store_mean": 30.0, "promo": 0, "price": 52.0, "holiday": 0}
+}
